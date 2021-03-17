@@ -9,7 +9,6 @@ func (bc *BlockChain) insertSideChain(block *types.Block, it *insertIterator) (i
 		if number := block.NumberU64(); current.NumberU64() >= number {
 			canonical := bc.GetBlockByNumber(number)
 			if canonical != nil && canonical.Hash() == block.Hash() {
-
 				externTd = bc.GetTd(block.Hash(), block.NumberU64())
 				continue
 			}
