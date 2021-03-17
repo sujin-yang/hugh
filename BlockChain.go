@@ -1,4 +1,3 @@
-
 func (bc *BlockChain) insertSideChain(block *types.Block, it *insertIterator) (int, error) {
 	var (
 		externTd *big.Int
@@ -60,9 +59,7 @@ func (bc *BlockChain) insertSideChain(block *types.Block, it *insertIterator) (i
 		memory common.StorageSize
 	)
 	for i := len(hashes) - 1; i >= 0; i-- {
-		// Append the next block to our batch
 		block := bc.GetBlock(hashes[i], numbers[i])
-
 		blocks = append(blocks, block)
 		memory += block.Size()
 
@@ -139,7 +136,6 @@ func (bc *BlockChain) reorg(oldBlock, newBlock *types.Block) error {
 		}
 	)
 	if oldBlock.NumberU64() > newBlock.NumberU64() {
-		// Old chain is longer, gather all transactions and logs as deleted ones
 		for ; oldBlock != nil && oldBlock.NumberU64() != newBlock.NumberU64(); oldBlock = bc.GetBlock(oldBlock.ParentHash(), oldBlock.NumberU64()-1) {
 			oldChain = append(oldChain, oldBlock)
 			deletedTxs = append(deletedTxs, oldBlock.Transactions()...)
@@ -167,7 +163,6 @@ func (bc *BlockChain) reorg(oldBlock, newBlock *types.Block) error {
 
 		newChain = append(newChain, newBlock)
 
-		// Step back with both chains
 		oldBlock = bc.GetBlock(oldBlock.ParentHash(), oldBlock.NumberU64()-1)
 		newBlock = bc.GetBlock(newBlock.ParentHash(), newBlock.NumberU64()-1)
 	}
@@ -247,10 +242,8 @@ func (bc *BlockChain) maintainTxIndex(ancients uint64) {
 
 		if tail == nil {
 			if bc.txLookupLimit == 0 || head < bc.txLookupLimit {
-				// Nothing to delete, write the tail and return
 				rawdb.WriteTxIndexTail(bc.db, 0)
 			} else {
-				// Prune all stale tx indices and record the tx index tail
 				rawdb.UnindexTransactions(bc.db, 0, head-bc.txLookupLimit+1, bc.quit)
 			}
 			return
